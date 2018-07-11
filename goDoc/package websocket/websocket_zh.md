@@ -44,7 +44,7 @@ for {
 
 应用程序还可以使用`io.WriteCloser`和`io.Reader`接口发送和接收消息。要发送消息，请调用连接`NextWriter`方法以获取`io.WriteCloser`，将消息写入`writer`并在完成后关闭`writer`。要接收消息，请调用连接`NextReader`方法来获取`io.Reader`并读取，直到返回io.EOF。这段代码展示了如何使用`NextWriter`和`NextReader`方法回显消息：
 
-```
+```golang
 for {
     messageType, r, err := conn.NextReader()
     if err != nil {
@@ -83,7 +83,7 @@ WebSocket协议定义了三种类型的控制消息：close，ping和pong。调�
 
 应用必须读取连接来处理对方发来的关闭,ping和pong消息. 如果应用程序对其他消息不感兴趣，则应用程序应该启动一个go协程来读取并丢弃来自对等消息的消息。一个简单的示例如下:
 
-```
+```golang
 func readLoop(c *websocket.Conn) {
     for {
         if _, _, err := c.NextReader(); err != nil {
@@ -112,7 +112,7 @@ Upgrader 通过调用在CheckOrigin字段中指定函数来检查origin, 一旦C
 ## 压缩试验
 每条消息压缩扩展[RFC 7692](https://tools.ietf.org/html/rfc7692)都由该软件包以有限的容量实验性地支持。在Dialer 或者 Upgrader中设置Dialer or Upgrader为true的时候会尝试协商每个消息的压缩支持.
 
-```
+```golang
 var upgrader = websocket.Upgrader{
     EnableCompression: true,
 }
@@ -122,7 +122,7 @@ var upgrader = websocket.Upgrader{
 
 通过调用Conn相应的方法可以决定每条消息写入连接时是否被压缩.
 
-```
+```golang
 conn.EnableWriteCompression(false)
 ```
 
@@ -134,7 +134,7 @@ conn.EnableWriteCompression(false)
 [TOC]
 ## 例子
 ## 常量
-```
+```golang
 const (
     CloseNormalClosure           = 1000
     CloseGoingAway               = 1001
@@ -155,7 +155,7 @@ const (
 
 关闭码定义在[RFC 6455, 11.7](http://tools.ietf.org/html/rfc6455#section-11.7)中.
 
-```
+```golang
 const (
     // TextMessage denotes a text data message. The text message payload is
     // interpreted as UTF-8 encoded text data.
@@ -180,7 +180,7 @@ const (
 ```
 
 ## 变量
-```
+```golang
 var DefaultDialer = &Dialer{
     Proxy:            http.ProxyFromEnvironment,
     HandshakeTimeout: 45 * time.Second,
@@ -189,33 +189,33 @@ var DefaultDialer = &Dialer{
 
 DefaultDialer 是一个所有字段都会被设为默认值的拨号器.
 
-```
+```golang
 var ErrBadHandshake = errors.New("websocket: bad handshake")
 ```
 当 服务器请求握手无效的时候, ErrBadHandshake会被返回.
 
-```
+```golang
 var ErrCloseSent = errors.New("websocket: close sent")
 ```
 当应用程序在发送了关闭消息之后写入一条消息到连接
 会返回ErrReadLimit.
 
 ## func [FormatCloseMessage](https://github.com/gorilla/websocket/blob/master/conn.go#L1146)
-```
+```golang
 func FormatCloseMessage(closeCode int, text string) []byte
 ```
 FormatCloseMessage 格式化关闭码和文本作为websocket的关闭消息, 如果状态码为CloseNoStatusReceived会返回空消息.
 
 ## func [IsCloseError](https://github.com/gorilla/websocket/blob/master/conn.go#L150)
 
-```
+```golang
 func IsCloseError(err error, codes ...int) bool
 ```
 IsCloseError 返回布尔值,表示传入的error是否是*CloseError 指定的出错码.
 
 ## func [IsUnexpectedCloseError](https://github.com/gorilla/websocket/blob/master/conn.go#L163)
 
-```
+```golang
 func IsUnexpectedCloseError(err error, expectedCodes ...int) bool
 ```
 IsUnexpectedCloseError 返回布尔值表示error是否在*CloseError中预期的代码中.
@@ -227,27 +227,27 @@ func IsWebSocketUpgrade(r *http.Request) bool
 如果客户端请求升级WebSocket协议,返回true
 
 ## func [ReadJSON](https://github.com/gorilla/websocket/blob/master/json.go#L40)
-```
+```golang
 func ReadJSON(c *Conn, v interface{}) error
 ```
 ReadJSON 从连接中读取下一个 json编码消息,并将值存入v指向的值中.  
 **废弃**: 使用c.ReadJSON代替
 
 ## func [Subprotocols](https://github.com/gorilla/websocket/blob/master/server.go#L281)
-```
+```golang
 func Subprotocols(r *http.Request) []string
 ```
 Subprotocols返回Sec-Websocket-Protocol头中客户端请求的子协议。
 
 ## func [WriteJSON](https://github.com/gorilla/websocket/blob/master/json.go#L15)
-```
+```golang
 func WriteJSON(c *Conn, v interface{}) error
 ```
 WriteJSON将v的JSON编码作为消息写入。  
 **废弃**: 使用c.WriteJSON代替
 
 ## func [CloseError](https://github.com/gorilla/websocket/blob/master/conn.go#L104)
-```
+```golang
 type CloseError struct {
     // Code is defined in RFC 6455, section 11.7.
     Code int
@@ -258,12 +258,12 @@ type CloseError struct {
 ```
 CloseError表示一条关闭消息。
 ### func (*CloseError) Error
-```
+```golang
 func (e *CloseError) Error() string
 ```
 
 ## type [Conn](https://github.com/gorilla/websocket/blob/master/conn.go#L227)
-```
+```golang
 type Conn struct {
     // contains filtered or unexported fields
 }
@@ -271,7 +271,7 @@ type Conn struct {
 Conn类型表示一个WebSocket连接。
 
 ### func [NewClient](https://github.com/gorilla/websocket/blob/master/client.go#L37)
-```
+```golang
 func NewClient(netConn net.Conn, u *url.URL, requestHeader http.Header, readBufSize, writeBufSize int) (c *Conn, response *http.Response, err error)
 ```
 NewClient 用给定的网络练剑创建一个新客户端连击. URL参数u 指定这个主机和请求的URI. 使用请求头去指定origin, 子协议(Sec-WebSocket-Protocol) 和缓存(Cookie). 使用头部返回去获取选定的子协议(Sec-WebSocket-Protocol)和缓存(Set-Cookie).
@@ -281,7 +281,7 @@ NewClient 用给定的网络练剑创建一个新客户端连击. URL参数u 指
 
 ### func [Upgrade](https://github.com/gorilla/websocket/blob/master/server.go#L267)
 
-```
+```golang
 func Upgrade(w http.ResponseWriter, r *http.Request, responseHeader http.Header, readBufSize, writeBufSize int) (*Conn, error)
 ```
 
@@ -310,20 +310,20 @@ responseHeader包含在对客户端升级请求的响应中。使用responseHead
 
 ### func (*Conn) [Close](https://github.com/gorilla/websocket/blob/master/conn.go#L347)
 
-```
+```golang
 func (c *Conn) Close() error
 ```
 Close关闭底层网络链接,不需要发送或者等待关闭消息.
 
 ### func (*Conn) [CloseHandler](https://github.com/gorilla/websocket/blob/master/conn.go#L1044)
-```
+```golang
 func (c *Conn) CloseHandler() func(code int, text string) error
 ```
 CloserHandler 返回当当前关闭处理器.
 
 
 ### func(*Conn) [EnableWriteCompression](https://github.com/gorilla/websocket/blob/master/conn.go#L1128)
-```
+```golang
 func (c *Conn) EnableWriteCompression(enable bool)
 ```
 EnableWriteCompression 启用和禁用后续文本和二级制消息的写入压缩. 如果没有与对方协商压缩,则此方法为空操作.
@@ -332,7 +332,7 @@ EnableWriteCompression 启用和禁用后续文本和二级制消息的写入压
 LocalAddr 返回本地的IP地址
 
 ### func(*Conn) [NextReader](https://github.com/gorilla/websocket/blob/master/conn.go#L928)
-```
+```golang
 func (c *Conn) NextReader() (messageType int, r io.Reader, err error)
 ```
 NextReader 返回从对方收到的后续数据消息. 返回的messageType 是 TextMessage 或者BinaryMessage.
@@ -355,38 +355,38 @@ NextWriter返回一个写入器,由于发送后续消息. 写入器的关闭方�
 
 ### func (*Conn) [PingHandler](https://github.com/gorilla/websocket/blob/master/conn.go#L1074)
 
-```
+```golang
 func (c *Conn) PingHandler() func(appData string) error
 ```
 PingHandler 返回当前ping处理器
 
 ### func (*Conn) [PongHandler](https://github.com/gorilla/websocket/blob/master/conn.go#L1101)
-```
+```golang
 func (c *Conn) PongHandler() func(appData string) error
 ```
 PongHandler 返回当前pong处理器
 
 ### func (*Conn) [ReadJSON](https://github.com/gorilla/websocket/blob/master/json.go#L49)
-```
+```golang
 func (c *Conn) ReadJSON(v interface{}) error
 ```
 ReadJSON 从连接中读取后续json编码格式的消息. 并将其存储在v指向的值中。  
 有关json转换到Go值的详细信息，请参阅编码/json Unmarshal函数的文档。
 
 ### func (*Conn) [ReadMessage](https://github.com/gorilla/websocket/blob/master/conn.go#L1018)
-```
+```golang
 func (c *Conn) ReadMessage() (messageType int, p []byte, err error)
 ```
 ReadMessage是一个助手方法，用于使用NextReader获取读取器并从该读取器读取到缓冲区。
 
 ### func (*Conn) [RemoteAddr](https://github.com/gorilla/websocket/blob/master/conn.go#L357)
-```
+```golang
 var (c *Conn) RemoteAddr() net.Addr
 ```
 ReomoteAddr返回远端主机地址.
 
 ### func (*Conn) SetCloseHandler
-```
+```golang
 func (c *Conn) SetCloseHandler(h func(code int, text string) error)
 ```
  
@@ -397,13 +397,13 @@ SetCloseHandler 设置处理器,用户处理对方发送过来的关闭消息, h
 当收到关闭消息时,此连接读取方法返回一个CloseError. 大多数应用应当把关闭消息当做常规错误消息处理的一部分来处理. 当应用必须在向对方返回关闭消息之前执行某些操作, 应用只能设置一个关闭处理器.
 
 ### func (*Conn) [SetCompressionLevel](https://github.com/gorilla/websocket/blob/master/conn.go#L1136)
-```
+```golang
 func (c *Conn) SetCompressionLevel(level int) error
 ```
 SetCompressionLevel为后续文本和二进制消息设置flate（这里并不知道怎么翻译）压缩级别。 如果未与对方协商压缩，则此函数为noop。 有关压缩级别的说明，请参阅compress / flate包。
 
 ### func(*Conn) [SetPingHandler](https://github.com/gorilla/websocket/blob/master/conn.go#L1085)
-```
+```golang
 func (c *Conn) SetPingHandler(h func(appData string) error)
 ```
 SetPingHandler设置从对方接收的ping消息的处理程序。 h的appData参数是PING消息应用程序数据。 默认的ping处理程序将pong发送给对方。
@@ -411,7 +411,7 @@ SetPingHandler设置从对方接收的ping消息的处理程序。 h的appData�
 处理程序函数从NextReader，ReadMessage和消息读取器读取方法调用。 应用程序必须读取连接以处理ping消息，如上面的控制消息部分所述。
 
 ### func(*Conn) [SetPongHandler](https://github.com/gorilla/websocket/blob/master/conn.go#L1112)
-```
+```golang
 func (c *Conn) SetPongHandler(h func(appData string) error)
 ```
 
@@ -424,38 +424,38 @@ SetPongHandler设置从对方接收的pong消息的处理程序。 h的appData�
 SetReadDeadline设置底层网络连接的读取截止日期。 读取超时后，websocket连接状态已损坏，所有将来的读取都将返回错误。 t的零值意味着读取不会超时
 
 ### func (*Conn) [SetReadLimit](https://github.com/gorilla/websocket/blob/master/conn.go#L1039)
-```
+```golang
 func (c *Conn) SetReadLimit(limit int64)
 ```
 SetReadLimit设置从对方读取的消息的最大限制。 如果消息超出限制，则连接会向对方发送关闭消息，并将ErrReadLimit返回给应用程序。
 
 ### func (*Conn) [SetWriteDeadline](https://github.com/gorilla/websocket/blob/master/conn.go#L761)
-```
+```golang
 func (c *Conn) SetWriteDeadline(t time.Time) error
 ```
 SetWriteDeadline设置底层网络连接的写入期限。 写入超时后，websocket状态已损坏，所有将来的写入都将返回错误。 t的零值表示写入不会超时。
 
 ### func (*Conn) [Subprotocol](https://github.com/gorilla/websocket/blob/master/conn.go#L341)
-```
+```golang
 func (c *Conn) Subprotocol() string
 ```
 Subprotocol返回协商的连接协议。
 
 ### func (*Conn) [UnderlyingConn](https://github.com/gorilla/websocket/blob/master/conn.go#L1121)
-```
+```golang
 func (c *Conn) UnderlyingConn() net.Conn
 ```
 UnderlyingConn返回内部net.Conn。 这可用于进一步修改连接特定标志
 
 
 ### func (*Conn) [WriteControl](https://github.com/gorilla/websocket/blob/master/conn.go#L401)
-```
+```golang
 func (c *Conn) WriteControl(messageType int, data []byte, deadline time.Time) error
 ```
 WriteControl在给定的截止日期之前写入控制消息。 允许的消息类型是CloseMessage，PingMessage和PongMessage。
 
 ### func (*Conn) [WriteJSON](https://github.com/gorilla/websocket/blob/master/json.go#L23)
-```
+```golang
 func (c *Conn) WriteJSON(v interface{}) error
 ```
 WriteJSON将v的JSON编码之后的文本作为消息。
@@ -463,19 +463,19 @@ WriteJSON将v的JSON编码之后的文本作为消息。
 有关将Go值转换为JSON的详细信息，请参阅encoding / json Marshal的文档。
 
 ### func (*Conn) [WriteMessage](https://github.com/gorilla/websocket/blob/master/conn.go#L732)
-```
+```golang
 func (c *Conn) WriteMessage(messageType int, data []byte) error
 ```
 WriteMessage是一个辅助方法，用于使用NextWriter获取编写器，编写消息并关闭编写器。
 
 ### func (*Conn) [WritePreparedMessage](https://github.com/gorilla/websocket/blob/master/conn.go#L709)
-```
+```golang
 func (c *Conn) WritePreparedMessage(pm *PreparedMessage) error
 ```
 WritePreparedMessage将准备好的消息写入连接。
 
 ## type [Dialer](https://github.com/gorilla/websocket/blob/master/client.go#L49)
-```
+```golang
 type Dialer struct {
     // NetDial specifies the dial function for creating TCP connections. If
     // NetDial is nil, net.Dial is used.
@@ -518,7 +518,7 @@ type Dialer struct {
 
 ### func (*Dialer) [Dial](https://github.com/gorilla/websocket/blob/master/client.go#L125)
 
-```
+```golang
 func (d *Dialer) Dial(urlStr string, requestHeader http.Header) (*Conn, *http.Response, error)
 ```
 拨号创建新的客户端连接。 使用requestHeader指定源（Origin），子协议（Sec-WebSocket-Protocol）和cookie（Cookie）。 使用response.Header获取所选的子协议（Sec-WebSocket-Protocol）和cookie（Set-Cookie）。
@@ -527,7 +527,7 @@ func (d *Dialer) Dial(urlStr string, requestHeader http.Header) (*Conn, *http.Re
 
 
 ## type [HandshakeError](https://github.com/gorilla/websocket/blob/master/server.go#L18)
-```
+```golang
 type HandshakeError struct {
     // contains filtered or unexported fields
 }
@@ -535,11 +535,11 @@ type HandshakeError struct {
 HandshakeError描述了来自对等方的握手错误。
 
 ### func (HandshakeError) [Error](https://github.com/gorilla/websocket/blob/master/server.go#L22)
-```
+```golang
 func (e HandshakeError) Error() string
 ```
 ## type [PreparedMessage](https://github.com/gorilla/websocket/blob/master/prepared.go#L19)
-```
+```golang
 type PreparedMessage struct {
     // contains filtered or unexported fields
 }
@@ -548,13 +548,13 @@ PreparedMessage缓存在串行的消息负载上(PS.这里翻译可能有问题)
 
 ### func [NewPreparedMessage](https://github.com/gorilla/websocket/blob/master/prepared.go#L44)
 
-```
+```golang
 func NewPreparedMessage(messageType int, data []byte) (*PreparedMessage, error)
 ```
 NewPreparedMessage返回初始化的PreparedMessage。你可以使用WritePreparedMessage方法将其发送到连接。 对于一组当前连接选项，有效的线表示将仅延迟计算一次。
 
 ## type [Upgrader](https://github.com/gorilla/websocket/blob/master/server.go#L26)
-```
+```golang
 type Upgrader struct {
     // HandshakeTimeout specifies the duration for the handshake to complete.
     HandshakeTimeout time.Duration
@@ -595,7 +595,7 @@ Upgrader指定用于将HTTP连接升级到WebSocket连接的参数。
 
 ### func (*Upgrader) [Upgrade](https://github.com/gorilla/websocket/blob/master/server.go#L110)
 
-```
+```golang
 func (u *Upgrader) Upgrade(w http.ResponseWriter, r *http.Request, responseHeader http.Header) (*Conn, error)
 ```
 升级会将HTTP服务器连接升级到WebSocket协议。
